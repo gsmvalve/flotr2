@@ -7,3 +7,8 @@ build
 .jhw-cache
 node_modules
 dev
+flotr2.js
+flotr2.min.js
+flotr2.ie.min.js
+flotr2.nolibs.js
+
