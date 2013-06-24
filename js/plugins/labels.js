@@ -18,7 +18,7 @@ Flotr.addPlugin('labels', {
       div, i, html = '',
       noLabels = 0,
       options  = this.options,
-      ctx      = this.ctx,
+      ctx      = this.uctx,
       a        = this.axes,
       style    = { size: options.fontSize };
 
