@@ -88,7 +88,6 @@ Axis.prototype = {
    * Calculates the range of an axis to apply autoscaling.
    */
   calculateRange: function () {
-
     if (!this.used) return;
 
     var axis  = this,
@@ -96,7 +95,7 @@ Axis.prototype = {
       min     = o.min !== null ? o.min : axis.datamin,
       max     = o.max !== null ? o.max : axis.datamax,
       margin  = o.autoscaleMargin;
-        
+
     if (o.scaling == 'logarithmic') {
       if (min <= 0) min = axis.datamin;
 
@@ -242,7 +241,6 @@ Axis.prototype = {
   },
 
   _calculateTicks : function () {
-
     var axis      = this,
         o         = axis.options,
         tickSize  = axis.tickSize,
@@ -256,10 +254,9 @@ Axis.prototype = {
     
     if (o.minorTickFreq)
       minorTickSize = tickSize / o.minorTickFreq;
-                      
+
     // Then store all possible ticks.
     for (i = 0; (v = v2 = start + i * tickSize) <= max; ++i){
-      
       // Round (this is always needed to fix numerical instability).
       decimals = o.tickDecimals;
       if (decimals === null) decimals = 1 - Math.floor(Math.log(tickSize) / Math.LN10);
