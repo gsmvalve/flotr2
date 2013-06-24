@@ -255,6 +255,28 @@ Graph.prototype = {
     if (after) after();
   },
   /**
+   * Redraw helper
+   */
+  redraw: function(options){
+    options = options || {};
+
+    // Set up axes ranges
+    if(options.xmin) this.axes.x.min = options.xmin;
+    if(options.xmax) this.axes.x.max = options.xmax;
+    if(options.ymin) this.axes.y.min = options.ymin;
+    if(options.ymax) this.axes.y.max = options.ymax;
+
+    // Set up axes scales
+    if(options.xmin || options.xmax) this.axes.x.setScale();
+    if(options.ymin || options.ymax) this.axes.y.setScale();
+
+    // Clear the graph and redraw it
+    this.uctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    this.octx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    this.draw();
+  },
+  /**
    * Actually draws the graph.
    * @param {Object} series - series to draw
    */
