@@ -38,6 +38,11 @@ Flotr.addPlugin('selection', {
 
   callbacks: {
     'flotr:mouseup' : function (event) {
+      if(!event.shiftKey){
+          clearInterval(this.selection.interval);
+          this.selection.clearSelection();
+          return;
+      }
 
       var
         options = this.options.selection,
@@ -62,6 +67,7 @@ Flotr.addPlugin('selection', {
       }
     },
     'flotr:mousedown' : function (event) {
+      if(!event.shiftKey) return;
 
       var
         options = this.options.selection,
