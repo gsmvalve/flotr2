@@ -15,9 +15,8 @@ Flotr.addPlugin('graphGrid', {
   },
 
   drawGrid: function(){
-
     var
-      ctx = this.ctx,
+      ctx = this.uctx,
       options = this.options,
       grid = options.grid,
       verticalLines = grid.verticalLines,
@@ -127,7 +126,7 @@ Flotr.addPlugin('graphGrid', {
       options = that.options,
       grid = options.grid,
       outline = grid.outline,
-      ctx = that.ctx,
+      ctx = that.uctx,
       backgroundImage = grid.backgroundImage,
       plotOffset = that.plotOffset,
       leftOffset = plotOffset.left,
@@ -175,9 +174,11 @@ Flotr.addPlugin('graphGrid', {
       ctx.moveTo(orig, orig);
       plotWidth = plotWidth - (lw / 2) % 1;
       plotHeight = plotHeight + lw / 2;
+
       ctx[outline.indexOf('n') !== -1 ? lineTo : moveTo](plotWidth, orig);
-      ctx[outline.indexOf('e') !== -1 ? lineTo : moveTo](plotWidth, plotHeight);
-      ctx[outline.indexOf('s') !== -1 ? lineTo : moveTo](orig, plotHeight);
+      var sY = outline.indexOf('n') !== -1 ? plotHeight : plotHeight - (lw / 2);
+      ctx[outline.indexOf('e') !== -1 ? lineTo : moveTo](plotWidth, sY);
+      ctx[outline.indexOf('s') !== -1 ? lineTo : moveTo](orig, sY);
       ctx[outline.indexOf('w') !== -1 ? lineTo : moveTo](orig, orig);
       ctx.stroke();
       ctx.closePath();
