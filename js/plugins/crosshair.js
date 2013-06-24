@@ -63,21 +63,26 @@ Flotr.addPlugin('crosshair', {
     var
       plotOffset = this.plotOffset,
       position = this.lastMousePos,
-      context = this.octx;
+      context = this.octx,
+      mode = this.options.crosshair.mode;
 
     if (position) {
-      context.clearRect(
-        Math.round(position.relX) + plotOffset.left,
-        plotOffset.top,
-        1,
-        this.plotHeight + 1
-      );
-      context.clearRect(
-        plotOffset.left,
-        Math.round(position.relY) + plotOffset.top,
-        this.plotWidth + 1,
-        1
-      );    
+      if(mode.indexOf('x') != -1){
+        context.clearRect(
+          Math.round(position.relX) + plotOffset.left,
+          plotOffset.top,
+          1,
+          this.plotHeight + 1
+        );
+      }
+      if(mode.indexOf('y') != -1){
+        context.clearRect(
+          plotOffset.left,
+          Math.round(position.relY) + plotOffset.top,
+          this.plotWidth + 1,
+          1
+        );    
+      }
     }
   }
 });
