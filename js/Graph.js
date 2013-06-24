@@ -38,6 +38,7 @@ Graph = function(el, data, options){
     this._initEvents();
 
     this.findDataRanges();
+    this._setMainYAxisOptions();
     this.calculateSpacing();
 
     this.draw(_.bind(function() {
@@ -108,6 +109,7 @@ Graph.prototype = {
     if (!a.x.used && !a.x2.used) a.x.used = true;
     if (!a.y.used && !a.y2.used) a.y.used = true;
 
+    // Calculate ranges for generic axes
     _.each(a, function (axis) {
       axis.calculateRange();
     });
@@ -118,6 +120,10 @@ Graph.prototype = {
 
     _.each(this.series, function (series) {
       if (series.hide) return;
+
+      // If the axis doesn't use generic y-axis, calculate the range
+      if(series.yaxis !== this.axes.y && series.yaxis !== this.axes.y2) series.yaxis.calculateRange();
+
       _.each(types, function (type) {
         if (series[type] && series[type].show) {
           this.extendRange(type, series);
@@ -218,7 +224,7 @@ Graph.prototype = {
     this.plotWidth  = this.canvasWidth - p.left - p.right;
     this.plotHeight = this.canvasHeight - p.bottom - p.top;
 
-    // TODO post refactor, fix this
+    // Set generic axes properties
     x.length = x2.length = this.plotWidth;
     y.length = y2.length = this.plotHeight;
     y.offset = y2.offset = this.plotHeight;
@@ -226,12 +232,24 @@ Graph.prototype = {
     x2.setScale();
     y.setScale();
     y2.setScale();
+
+    // Set y-axis scale on the series
+    for(var i = 0, length = this.series.length, __series; i < length; i++){
+      __series = this.series[i];
+
+      // Skip if we're using generic axis on the serie
+      if(__series.yaxis === y || __series.yaxis === y2) continue;
+
+      // Otherwise, do the thing
+      __series.yaxis.length = this.plotHeight;
+      __series.yaxis.offset = this.plotHeight;
+      __series.yaxis.setScale();
+    }
   },
   /**
    * Draws grid, labels, series and outline.
    */
   draw: function(after) {
-
     var
       context = this.ctx,
       i;
@@ -300,6 +318,11 @@ Graph.prototype = {
     if (!drawn) drawChart.call(this, series, this.options.defaultType);
   },
 
+  setMainYAxis: function(seriesId){
+    this._setMainYAxisOptions(seriesId);
+    this.redraw();
+  },
+
   getOptions : function (series, typeKey) {
     var
       type = series[typeKey],
@@ -310,6 +333,7 @@ Graph.prototype = {
         context     : this.ctx,
         width       : this.plotWidth,
         height      : this.plotHeight,
+        series      : series,
         fontSize    : this.options.fontSize,
         fontColor   : this.options.fontColor,
         textEnabled : this.textEnabled,
@@ -513,7 +537,7 @@ Graph.prototype = {
   _initMembers: function() {
     this._handles = [];
     this.lastMousePos = {pageX: null, pageY: null };
-    this.plotOffset = {left: 0, right: 0, top: 0, bottom: 0};
+    this.plotOffset = {left: 0, right: 0, top: 10, bottom: 0};
     this.ignoreClick = true;
     this.prevHit = null;
   },
@@ -624,10 +648,15 @@ Graph.prototype = {
       throw 'Invalid dimensions for plot, width = ' + size.width + ', height = ' + size.height + ', resolution = ' + o.resolution;
     }
 
+    // Base canvas for drawing grid features
+    this.underlay = getCanvas(this.underlay, 'underlay');
     // Main canvas for drawing graph types
     this.canvas = getCanvas(this.canvas, 'canvas');
     // Overlay canvas for interactive features
     this.overlay = getCanvas(this.overlay, 'overlay');
+
+    this.uctx = getContext(this.underlay);
+    this.uctx.clearRect(0, 0, this.uctx.width, this.uctx.height);
     this.ctx = getContext(this.canvas);
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.octx = getContext(this.overlay);
@@ -785,6 +814,20 @@ Graph.prototype = {
 
     el.graph = this;
     this.el = el;
+  },
+
+  _setMainYAxisOptions: function(seriesId){
+    seriesId = typeof seriesId != 'undefined' ? seriesId : this.options.mainSeries;
+    this.options.mainSeries = seriesId;
+
+    this.axes.y.datamin = this.series[seriesId].yaxis.datamin;
+    this.axes.y.datamax = this.series[seriesId].yaxis.datamax;
+
+    this.axes.y.calculateRange();
+    this.axes.y.setScale();
+    this.axes.y.calculateTicks();
+
+    this.axes.y.options.title = this.series[seriesId].label;
   }
 };
 
