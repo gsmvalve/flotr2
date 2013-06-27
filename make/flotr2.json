@@ -25,7 +25,6 @@
       "./js/plugins/crosshair.js",
       "./js/plugins/download.js",
       "./js/plugins/grid.js",
-      "./js/plugins/hit.js",
       "./js/plugins/navigation.js",
       "./js/plugins/navigation-bar.js",
       "./js/plugins/selection.js",
@@ -34,6 +33,7 @@
       "./js/plugins/spreadsheet.js",
       "./js/plugins/timeticks.js",
       "./js/plugins/titles.js",
+      "./js/plugins/track.js",
       "./js/plugins/zoom.js"
     ]
   }
