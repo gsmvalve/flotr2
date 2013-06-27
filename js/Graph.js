@@ -157,7 +157,7 @@ Graph.prototype = {
         y = a.y,
         y2 = a.y2,
         maxOutset = options.grid.outlineWidth,
-        i, j, l, dim;
+        i, j, l, dim, __series;
 
     // TODO post refactor, fix this
     _.each(a, function (axis) {
@@ -183,7 +183,7 @@ Graph.prototype = {
     );
     this.subtitleHeight = dim.height;
 
-    for(j = 0; j < options.length; ++j){
+    for(j = 0, l = options.length; j < l; ++j){
       if (series[j].points.show){
         maxOutset = Math.max(maxOutset, series[j].points.radius + series[j].points.lineWidth/2);
       }
@@ -234,10 +234,10 @@ Graph.prototype = {
     y2.setScale();
 
     // Set y-axis scale on the series
-    for(i = 0, length = this.series.length, __series; i < length; i++){
-      __series = this.series[i];
+    for(i = 0, l = series.length; i < l; i++){
+      __series = series[i];
 
-      // Skip if we're using generic axis on the serie
+      // Skip if we're using generic axis on the series
       if(__series.yaxis === y || __series.yaxis === y2) continue;
 
       // Otherwise, do the thing

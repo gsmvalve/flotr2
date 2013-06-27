@@ -110,7 +110,7 @@ Flotr.addType('lines', {
       prevy     = null,
       zero      = yScale(0),
       start     = null,
-      x1, x2, y1, y2, stack1, stack2,
+      x1, x2, y1, y2, stack1, stack2, nextPoint,
       maxPoints = options.maxPoints,
       simplificationFactor = width / maxPoints;
       
