@@ -234,7 +234,7 @@ Graph.prototype = {
     y2.setScale();
 
     // Set y-axis scale on the series
-    for(var i = 0, length = this.series.length, __series; i < length; i++){
+    for(i = 0, length = this.series.length, __series; i < length; i++){
       __series = this.series[i];
 
       // Skip if we're using generic axis on the serie

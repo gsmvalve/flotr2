@@ -126,14 +126,16 @@
          * Bounds normalization helper
          */
         __normalizeBounds: function(range, axis){
+            var delta;
+
             // If requested range overflows the beginning of graph's bounds
             if(range[0] < axis.datamin && range[1] <= axis.datamax){
-                var delta = axis.datamin - range[0];
+                delta = axis.datamin - range[0];
                 range[0] = axis.datamin;
                 range[1] = Math.min(axis.datamax, range[1] + delta);
             // If requested range overflows the end of graph's bounds
             }else if(range[0] >= axis.datamin && range[1] > axis.datamax){
-                var delta = range[1] - axis.datamax;
+                delta = range[1] - axis.datamax;
                 range[0] = Math.max(axis.datamin, range[0] - delta);
                 range[1] = axis.datamax;
             // If requested range doesn't fit into graph's bounds no matter what we do
@@ -157,7 +159,7 @@
             if(position - this.axes.x.min >= span * (1 - padding)){
                 this.navigation.setCenter(this.axes.x.min + 1.5 * span - (2 * span * padding));
             }else if(position - this.axes.x.min <= span * padding){
-                this.navigation.setCenter(this.axes.x.min + 0.5 * span - (span * padding))
+                this.navigation.setCenter(this.axes.x.min + 0.5 * span - (span * padding));
             }
         },
         
@@ -189,14 +191,16 @@
          * @param {Object} bounds - Object with coordinates of bounds.
          */
         setBounds: function(bounds){
+            var normalized;
+
             if(this.navigation.selY){
-                var normalized = this.navigation.__normalizeBounds([bounds.y1, bounds.y2], this.axes.y);
+                normalized = this.navigation.__normalizeBounds([bounds.y1, bounds.y2], this.axes.y);
                 this.navigation.__bounds.y1 = normalized[0];
                 this.navigation.__bounds.y2 = normalized[1];
             }
     
             if(this.navigation.selX){
-                var normalized = this.navigation.__normalizeBounds([bounds.x1, bounds.x2], this.axes.x);
+                normalized = this.navigation.__normalizeBounds([bounds.x1, bounds.x2], this.axes.x);
                 this.navigation.__bounds.x1 = normalized[0];
                 this.navigation.__bounds.x2 = normalized[1];
             }
@@ -224,7 +228,7 @@
                         });
 
                         E.fire(ctx.el, 'flotr:setBounds', ctx.navigation.__bounds);
-                    }
+                    };
                 }(this));
             }
         }

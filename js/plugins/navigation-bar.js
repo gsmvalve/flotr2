@@ -138,7 +138,7 @@
                         return false;
                     }
                 }
-            })
+            });
             
             // Attach zoom handles to pan handle (haah!)
             D.insert(this.navigationBar.handle, this.navigationBar.leftHandle);

@@ -104,11 +104,11 @@ var E = Flotr.EventAdapter,
         format: function(time, format){
             time = moment(time);
             var formats = this.timeticks.options.formats;
-            if(time.month() == 0 && time.date() == 1) return time.format(formats.year);
+            if(time.month() === 0 && time.date() == 1) return time.format(formats.year);
             if(time.date() == 1) return time.format(formats.month);
-            if(time.hours() == 0 && time.minutes() == 0) return time.format(formats.day);
+            if(time.hours() === 0 && time.minutes() === 0) return time.format(formats.day);
             return time.format(formats[format]);
         }
-    })
+    });
 
 })();

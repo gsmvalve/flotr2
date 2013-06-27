@@ -26,13 +26,13 @@ var E = Flotr.EventAdapter,
         mouseWheel: function(event){
             if(!event) event = window.event;
 
-            var delta = 0;
-            if(event.wheelDelta){
-                delta = event.wheelDelta;
-            }else if(event.detail){
-                delta = -event.detail;
+            var delta = 0, __e = event.originalEvent;
+            if(__e.wheelDelta){
+                delta = __e.wheelDelta;
+            }else if(__e.detail){
+                delta = -__e.detail;
             }
-            
+
             delta = delta > 0 ? 1 : -1;
 
             this.zoom.zoom(delta);
@@ -48,7 +48,7 @@ var E = Flotr.EventAdapter,
             var
                 zf = delta * this.zoom.options.zoomFactor,
                 xa = this.axes.x,
-                xaSpan = xa.max - xa.min
+                xaSpan = xa.max - xa.min,
                 ya = this.axes.y,
                 yaSpan = ya.max - ya.min,
                 bounds = {
@@ -73,6 +73,6 @@ var E = Flotr.EventAdapter,
 
             E.fire(this.el, 'flotr:zoom', [bounds, this]);
         }
-    })
+    });
 
 })();

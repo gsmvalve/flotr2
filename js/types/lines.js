@@ -126,7 +126,7 @@ Flotr.addType('lines', {
         
         if(options.fillBorder) context.stroke();
       }
-    }
+    };
 
     if (length < 1) return;
 
@@ -161,11 +161,11 @@ Flotr.addType('lines', {
     // Now let's draw some!
     context.beginPath();
 
-    for(var i = startIndex, point, nextPoint; i < endIndex; i++){
+    for(i = startIndex, point, nextPoint; i < endIndex; i++){
       point = series.simplifiedData[i], nextPoint = series.simplifiedData[i+1];
 
       // Allow for empty values
-      if(point == null || nextPoint == null){
+      if(point === null || nextPoint === null){
         if(options.fill){
           if(i > 0){
             context.stroke();
