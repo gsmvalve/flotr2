@@ -92,7 +92,7 @@ Axis.prototype = {
 
     var axis  = this,
       o       = axis.options,
-      min     = o.min !== null ? o.min : axis.datamin,
+      min     = o.zeroBased ? 0 : (o.min !== null ? o.min : axis.datamin),
       max     = o.max !== null ? o.max : axis.datamax,
       margin  = o.autoscaleMargin;
 
@@ -141,8 +141,8 @@ Axis.prototype = {
     // Autoscaling. @todo This probably fails with log scale. Find a testcase and fix it
     if(o.min === null && o.autoscale){
       axis.min -= axis.tickSize * margin;
-      // Make sure we don't go below zero if all values are positive.
-      if(axis.min < 0 && axis.datamin >= 0) axis.min = 0;
+      // Make sure we don't go below zero if we're zero based.
+      if(o.zeroBased === true) axis.min = 0;
       axis.min = axis.tickSize * Math.floor(axis.min / axis.tickSize);
     }
     
