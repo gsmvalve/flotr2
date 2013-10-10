@@ -61,6 +61,38 @@ function observe (object, name, callback) {
 
 Graph.prototype = {
 
+  _scaleAxes: function(){
+    var
+      a = this.axes
+      series = this.series
+      x = a.x,
+      x2 = a.x2,
+      y = a.y,
+      y2 = a.y2;
+
+    // Set generic axes properties
+    x.length = x2.length = this.plotWidth;
+    y.length = y2.length = this.plotHeight;
+    y.offset = y2.offset = this.plotHeight;
+    x.setScale();
+    x2.setScale();
+    y.setScale();
+    y2.setScale();
+
+    // Set y-axis scale on the series
+    for(var i = 0, l = series.length; i < l; i++){
+      __series = series[i];
+
+      // Skip if we're using generic axis on the series
+      if(__series.yaxis === y || __series.yaxis === y2) continue;
+
+      // Otherwise, do the thing
+      __series.yaxis.length = this.plotHeight;
+      __series.yaxis.offset = this.plotHeight;
+      __series.yaxis.setScale();
+    }
+  },
+
   destroy: function () {
     E.fire(this.el, 'flotr:destroy');
     _.each(this._handles, function (handle) {
@@ -146,7 +178,6 @@ Graph.prototype = {
    * Calculates axis label sizes.
    */
   calculateSpacing: function(){
-
     var a = this.axes,
         options = this.options,
         series = this.series,
@@ -224,27 +255,7 @@ Graph.prototype = {
     this.plotWidth  = this.canvasWidth - p.left - p.right;
     this.plotHeight = this.canvasHeight - p.bottom - p.top;
 
-    // Set generic axes properties
-    x.length = x2.length = this.plotWidth;
-    y.length = y2.length = this.plotHeight;
-    y.offset = y2.offset = this.plotHeight;
-    x.setScale();
-    x2.setScale();
-    y.setScale();
-    y2.setScale();
-
-    // Set y-axis scale on the series
-    for(i = 0, l = series.length; i < l; i++){
-      __series = series[i];
-
-      // Skip if we're using generic axis on the series
-      if(__series.yaxis === y || __series.yaxis === y2) continue;
-
-      // Otherwise, do the thing
-      __series.yaxis.length = this.plotHeight;
-      __series.yaxis.offset = this.plotHeight;
-      __series.yaxis.setScale();
-    }
+    this._scaleAxes();
   },
   /**
    * Draws grid, labels, series and outline.
@@ -293,6 +304,32 @@ Graph.prototype = {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.octx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.draw();
+  },
+  /**
+   * Resize helper
+   */
+  resize: function(){
+    var
+      width = D.size(this.el).width,
+      height = D.size(this.el).height,
+      ctxs = [this.canvas, this.ctx.canvas, this.octx.canvas, this.uctx.canvas];
+
+    for(var i = 0, length = ctxs.length; i < length; i++){
+      ctxs[i].setAttribute('width', width);
+      ctxs[i].setAttribute('height', height);
+      D.setStyles(ctxs[i], {width: width +'px', height: height +'px'});
+    }
+
+    this.canvasWidth = width;
+    this.canvasHeight = height;
+    this.plotWidth = this.canvasWidth - this.plotOffset.left - this.plotOffset.right;
+    this.plotHeight = this.canvasHeight - this.plotOffset.top - this.plotOffset.bottom;
+
+    this._scaleAxes();
+
+    E.fire(this.el, 'flotr:resize', [{width: width, height: height}, this]);
+
+    this.redraw();
   },
   /**
    * Actually draws the graph.
@@ -822,6 +859,9 @@ Graph.prototype = {
 
     this.axes.y.datamin = this.series[seriesId].yaxis.datamin;
     this.axes.y.datamax = this.series[seriesId].yaxis.datamax;
+    this.axes.y.options.zeroBased = this.series[seriesId].yaxis.options.zeroBased;
+    this.axes.y.options.autoscale = this.series[seriesId].yaxis.options.autoscale;
+    this.axes.y.options.autoscaleMargin = this.series[seriesId].yaxis.options.autoscaleMargin;
 
     this.axes.y.calculateRange();
     this.axes.y.setScale();
