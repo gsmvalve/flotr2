@@ -91,7 +91,7 @@ Flotr.addPlugin('graphGrid', {
       }
       ctx.stroke();
     }
-    else {
+    else if (typeof outline == 'string') {
       ctx.translate(this.plotOffset.left, this.plotOffset.top);
   
       // Draw grid background, if present in options.
@@ -159,7 +159,7 @@ Flotr.addPlugin('graphGrid', {
 
       ctx.stroke();
     }
-    else {
+    else if(typeof outline == 'string') {
       ctx.translate(leftOffset, topOffset);
       
       // Draw axis/grid border.
