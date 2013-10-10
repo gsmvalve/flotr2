@@ -14,14 +14,20 @@
 
         callbacks: {
             'flotr:afterinit': function(){
+                if(this.options.navigationBar === false) return;
                 this.navigationBar.render();
             },
             'flotr:destroy': function(){
+                if(this.options.navigationBar === false) return;
                 D.remove(this.navigationBar.element);
                 this.navigationBar.element = null;
             },
             'flotr:setBounds': function(bounds){
+                if(this.options.navigationBar === false) return;
                 this.navigationBar.update(bounds);
+            },
+            'flotr:resize': function(size){
+                this.navigationBar.width = D.size(this.navigationBar.element).width;
             }
         },
         
@@ -148,7 +154,7 @@
             D.insert(this.navigationBar.element, this.navigationBar.handle);
             
             // Insert the timeline into DOM
-            D.insert(this.options.timeline.container || this.el, this.navigationBar.element);
+            D.insert(this.options.navigationBar.container || this.el.parentNode, this.navigationBar.element);
 
             this.navigationBar.width = D.size(this.navigationBar.element).width;
             this.navigationBar.minWidth = D.size(this.navigationBar.leftHandle).width + D.size(this.navigationBar.rightHandle).width;
