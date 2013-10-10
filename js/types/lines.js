@@ -55,7 +55,17 @@ Flotr.addType('lines', {
     // If there's something left in the segment object, stack it
     if(segment.length >= 2) _data = _data.concat(simplify(segment, simplificationFactor), null);
 
-    return _data;
+    // Normalize the _data object
+    data = [];
+    for(i = 0; i < _data.length; i++){
+      if(_data[i] === null){
+        data.push(null);
+      }else{
+        data.push(_data[i][2]);
+      }
+    }
+
+    return data;
   },
 
 
@@ -110,7 +120,7 @@ Flotr.addType('lines', {
       prevy     = null,
       zero      = yScale(0),
       start     = null,
-      x1, x2, y1, y2, stack1, stack2, nextPoint,
+      x1, x2, y1, y2, xc, yc, stack1, stack2, nextPoint,
       maxPoints = options.maxPoints,
       simplificationFactor = width / maxPoints;
       
@@ -131,21 +141,21 @@ Flotr.addType('lines', {
     if (length < 1) return;
 
     // If scale has changed (zoom has changed) resimplify the dataset
-    if(series._previousScale != series.xaxis.scale) series.simplifiedData = this._simplify(data, {xScale: xScale, yScale: yScale, simplificationFactor: simplificationFactor});
+    if(series._previousScale != series.xaxis.scale) series.simplifiedData = series.noSimplification !== true ? this._simplify(data, {xScale: xScale, yScale: yScale, simplificationFactor: simplificationFactor}) : data;
     series._previousScale = series.xaxis.scale;
 
     var
       startIndex = null, endIndex = null,
-      i = series.simplifiedData.length - 1,
+      i = series.simplifiedData.length,
       point,
       startTime = options.xInverse(0),
       endTime = options.xInverse(width);
 
     // Determine start and end indexes to draw
-    while(i--){
+    while(--i >= 0){
       if(series.simplifiedData[i] === null) continue;
 
-      point = series.simplifiedData[i][2];
+      point = series.simplifiedData[i];
 
       if(endIndex === null && point[0] < endTime) endIndex = i;
       if(startIndex === null && point[0] < startTime){
@@ -179,9 +189,6 @@ Flotr.addType('lines', {
         continue;
       }
 
-      // Normalize points
-      point = point[2], nextPoint = nextPoint[2];
-
       x1 = xScale(point[0]);
       x2 = xScale(nextPoint[0]);
 
@@ -211,13 +218,17 @@ Flotr.addType('lines', {
         context.lineTo(prevx + shadowOffset / 2, y1 + shadowOffset);
         context.lineTo(prevx + shadowOffset / 2, prevy);
       }else{
-        //context.lineTo(prevx, prevy);
-        var xc = (x1 + x2) / 2;
-        var yc = (y1 + y2) / 2;
+        xc = (x1 + x2) / 2;
+        yc = (y1 + y2) / 2;
         context.quadraticCurveTo(x1, y1, xc, yc);
       }
     }
     
+    // End the curve
+    xc = (x1 + x2) / 2;
+    yc = (y1 + y2) / 2;
+    context.quadraticCurveTo(xc, yc, x2, y2);
+
     if (!options.fill || options.fill && !options.fillBorder) context.stroke();
     
     fill();
