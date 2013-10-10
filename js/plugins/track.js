@@ -9,36 +9,24 @@ Flotr.addPlugin('track', {
 	_prevCoords: {x: -Number.MAX_VALUE, y: -Number.MAX_VALUE},
 	_position: null,
 	_trackInterval: null,
+	_previouslyEnabled: null,
 
-	options: {
-		enabled: true,
-		updateInterval: 100
-	},
+	options: {enabled: true},
 
 	callbacks: {
 		// When mouse is downed (drag panning), stop the ticker
-		'mousedown': function(){ this.track._stopTicker(); },
+		'mousedown': function(){
+			this.track._previouslyEnabled = this.options.track.enabled;
+			this.options.track.enabled = false;
+		},
 		// When the mouse is released, restart the ticker
-		'mouseup': function(){ this.track._startTicker(); },
-		'mouseenter': function(){ this.track._startTicker(); },
-		'flotr:mousemove': function(event, position){ this.track._position = position; },
-		'mouseleave': function(){ this.track._stopTicker(); }
-	},
-
-
-	_startTicker: function(){
-		if(this.options.track.enabled === false) return;
-
-		this.track._trackInterval = setInterval((function(context){
-			return context.calculateHit;
-		})(this.track), this.options.track.updateInterval);
-	},
-
-
-	_stopTicker: function(){
-		if(this.options.track.enabled === false) return;
-
-		clearInterval(this.track._trackInterval);
+		'mouseup': function(){
+			this.options.track.enabled = this.track._previouslyEnabled;
+		},
+		'flotr:mousemove': function(event, position){
+			if(this.options.track.enabled === false) return;
+			this.track.calculateHit(position);
+		}
 	},
 
 
@@ -46,8 +34,6 @@ Flotr.addPlugin('track', {
 	 * Hit calculation
 	 */
 	calculateHit: function(position){
-		if(this.options.track.enabled === false) return;
-
 		position = position || this.track._position;
 		var
 			values = [],
@@ -119,16 +105,17 @@ Flotr.addPlugin('track', {
 					x1 = series.xaxis.d2p(series.data[indexRange[0]][0]),
 					y1 = series.yaxis.d2p(series.data[indexRange[0]][1]),
 					x2 = series.xaxis.d2p(series.data[indexRange[1]][0]),
-					y2 = series.yaxis.d2p(series.data[indexRange[1]][1]);
+					y2 = series.yaxis.d2p(series.data[indexRange[1]][1]),
+					relX = series.xaxis.d2p(position.x);
 
-				values[i] = series.yaxis.p2d(((y2 - y1) / (x2 - x1)) * (position.relX - x1) + y1);
+				values[i] = series.yaxis.p2d(((y2 - y1) / (x2 - x1)) * (relX - x1) + y1);
 			}
 		}
 
 		// Stash current x-coordinate
 		this.track._prevCoords.x = position.x;
 
-		Flotr.EventAdapter.fire(this.el, 'flotr:track', [this.series, values]);
+		Flotr.EventAdapter.fire(this.el, 'flotr:track', [position, this.series, values]);
 	}
 
 });
