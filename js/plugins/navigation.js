@@ -18,6 +18,8 @@
         
         callbacks: {
             'flotr:afterinit': function(){
+                if(this.options.navigation === false) return;
+
                 this.navigation.__bounds = {x1: this.axes.x.min, y1: this.axes.y.min, x2: this.axes.x.max, y2: this.axes.y.max};
                 this.navigation.__delta = {x: 0, y: 0};
                 this.navigation.__lastPos = {x: 0, y: 0};
