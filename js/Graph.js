@@ -63,8 +63,8 @@ Graph.prototype = {
 
   _scaleAxes: function(){
     var
-      a = this.axes
-      series = this.series
+      a = this.axes,
+      series = this.series,
       x = a.x,
       x2 = a.x2,
       y = a.y,
