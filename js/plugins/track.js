@@ -100,6 +100,8 @@ Flotr.addPlugin('track', {
 
 			if(typeof indexRange == 'number'){
 				values[i] = series.data[indexRange] ? series.data[indexRange][1] : null;
+			}else if(series.lines.steps){
+        		values[i] = series.data[indexRange[0]][1];
 			}else if(indexRange.constructor.toString().indexOf('Array') != -1){
 				var
 					x1 = series.xaxis.d2p(series.data[indexRange[0]][0]),
