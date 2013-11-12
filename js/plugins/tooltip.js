@@ -1,42 +1,69 @@
 (function(){
 
+var D = Flotr.DOM;
+
 Flotr.addPlugin('tooltip', {
+	_tooltip: null,
+
 	// Flotr callback bindings
 	callbacks: {
+		'mouseenter': function(event){
+			this.tooltip.show(event.originalEvent);
+		},
 		'flotr:track': function(position, series, values){
-			console.log('tracking! position:', position, 'series:', series, 'values:', values);
+			var serializedValues = [];
+			for(var i = 0, length = series.length; i < length; i++) serializedValues.push([series[i].name, series[i].formatValue(values[i])]);
+			this.tooltip.update(position, position.x, serializedValues);
+		},
+		'mouseleave': function(event){
+			this.tooltip.hide();
 		}
 	},
 
 
-	drawTooltip: function(content, x, y, options) {
+	create: function(){
+		var _tooltip = D.create('div');
+
+		D.addClass(_tooltip, 'flotr-tooltip');
+		D.addClass(_tooltip, 'hidden');
+
+		D.insert(this.el, _tooltip);
+
+		this.tooltip._tooltip = _tooltip;
+	},
+
+
+	show: function(event){
+		if(!this.tooltip._tooltip) this.tooltip.create();
+		D.removeClass(this.tooltip._tooltip, 'hidden');
+	},
+
+
+	update: function(position, time, values){
+		var markup = '';
+		for(var i = 0, length = values.length; i < length; i++) markup += '<tr><td>'+ values[i][0] +':</td><td>'+ values[i][1] +'</td></tr>';
+
+		markup = '<table>'+ markup +'</table>';
+		markup += '<p class="time">'+ moment(time).format('LLL') +'</p>';
+
+		this.tooltip._tooltip.innerHTML = markup;
+
 		var
-			mt = this.getMouseTrack(),
-			style = 'opacity:0.7;background-color:#000;color:#fff;display:none;position:absolute;padding:2px 8px;-moz-border-radius:4px;border-radius:4px;white-space:nowrap;',
-			p = options.position,
-			m = options.margin,
-			plotOffset = this.plotOffset;
+			tooltipOffset = this.tooltip._tooltip.offsetWidth,
+			offsetLeft = tooltipOffset / 2,
+			plotOffset = this.plotOffset.left,
+			marginLeft = Math.min(this.plotWidth - offsetLeft + plotOffset, Math.max(offsetLeft + plotOffset, position.relX + plotOffset));
 
-		if(x !== null && y !== null){
-			if(!options.relative){ // absolute to the canvas
-				if(p.charAt(0) == 'n') style += 'top:' + (m + plotOffset.top) + 'px;bottom:auto;';
-				else if(p.charAt(0) == 's') style += 'bottom:' + (m + plotOffset.bottom) + 'px;top:auto;';
-				if(p.charAt(1) == 'e') style += 'right:' + (m + plotOffset.right) + 'px;left:auto;';
-				else if(p.charAt(1) == 'w') style += 'left:' + (m + plotOffset.left) + 'px;right:auto;';
-			}else { // relative to the mouse
-				if(p.charAt(0) == 'n') style += 'bottom:' + (m - plotOffset.top - y + this.canvasHeight) + 'px;top:auto;';
-				else if(p.charAt(0) == 's') style += 'top:' + (m + plotOffset.top + y) + 'px;bottom:auto;';
-				if(p.charAt(1) == 'e') style += 'left:' + (m + plotOffset.left + x) + 'px;right:auto;';
-				else if(p.charAt(1) == 'w') style += 'right:' + (m - plotOffset.left - x + this.canvasWidth) + 'px;left:auto;';
-			}
+		// Calculate position
+		D.setStyles(this.tooltip._tooltip, {
+			left: -offsetLeft +'px',
+			marginLeft: marginLeft +'px'
+		});
+	},
 
-			mt.style.cssText = style;
-			D.empty(mt);
-			D.insert(mt, content);
-			D.show(mt);
-		}else{
-			D.hide(mt);
-		}
+
+	hide: function(){
+		D.addClass(this.tooltip._tooltip, 'hidden');
 	}
 });
 
