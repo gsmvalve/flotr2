@@ -12,43 +12,49 @@ function Series (o) {
 }
 
 Series.prototype = {
+  range: {data: null},
 
   getRange: function () {
+    // If dataset hasn't changed the range is based on, return cached results
+    if(this.range.data === this.data) return this.range;
 
     var
       data = this.data,
-      length = data.length,
+      i = data.length,
       xmin = Number.MAX_VALUE,
       ymin = Number.MAX_VALUE,
       xmax = -Number.MAX_VALUE,
       ymax = -Number.MAX_VALUE,
       xused = false,
       yused = false,
-      x, y, i;
+      x, y;
 
-    if (length < 0 || this.hide) return false;
+    if (i < 0 || this.hide) return false;
 
-    for (i = 0; i < length; i++) {
-      x = data[i][0];
-      y = data[i][1];
+    while(i--) {
+      x = data[i][0], y = data[i][1];
       if (x !== null) {
-        if (x < xmin) { xmin = x; xused = true; }
-        if (x > xmax) { xmax = x; xused = true; }
+        xmin = Math.min(xmin, x);
+        xmax = Math.max(xmax, x);
       }
       if (y !== null) {
-        if (y < ymin) { ymin = y; yused = true; }
-        if (y > ymax) { ymax = y; yused = true; }
+        ymin = Math.min(ymin, y);
+        ymax = Math.max(ymax, y);
       }
-    }
+    };
 
-    return {
+    this.range = {
       xmin : xmin,
       xmax : xmax,
       ymin : ymin,
       ymax : ymax,
-      xused : xused,
-      yused : yused
+      xused : (xmin != Number.MAX_VALUE || xmax != -Number.MAX_VALUE),
+      yused : (ymin != Number.MAX_VALUE || ymax != -Number.MAX_VALUE),
+      data: this.data,
+      length: this.data.length
     };
+
+    return this.range;
   }
 };
 
