@@ -19,6 +19,7 @@ Flotr.addPlugin('graphGrid', {
       ctx = this.uctx,
       options = this.options,
       grid = options.grid,
+      outline = grid.outline,
       verticalLines = grid.verticalLines,
       horizontalLines = grid.horizontalLines,
       minorVerticalLines = grid.minorVerticalLines,
@@ -26,7 +27,7 @@ Flotr.addPlugin('graphGrid', {
       plotHeight = this.plotHeight,
       plotWidth = this.plotWidth,
       a, v, i, j;
-        
+
     if(verticalLines || minorVerticalLines || 
            horizontalLines || minorHorizontalLines){
       E.fire(this.el, 'flotr:beforegrid', [this.axes.x, this.axes.y, options, this]);
