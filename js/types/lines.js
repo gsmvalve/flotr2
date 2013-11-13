@@ -141,7 +141,7 @@ Flotr.addType('lines', {
     if (length < 1) return;
 
     // If scale has changed (zoom has changed) resimplify the dataset
-    if(series._previousScale != series.xaxis.scale) series.simplifiedData = series.noSimplification !== true ? this._simplify(data, {xScale: xScale, yScale: yScale, simplificationFactor: simplificationFactor}) : data;
+    if(series._previousScale != series.xaxis.scale) series.simplifiedData = series.preSimplified !== true ? this._simplify(data, {xScale: xScale, yScale: yScale, simplificationFactor: simplificationFactor}) : data;
     series._previousScale = series.xaxis.scale;
 
     var
