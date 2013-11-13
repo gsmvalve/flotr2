@@ -108,9 +108,10 @@ Flotr.addPlugin('track', {
 					y1 = series.yaxis.d2p(series.data[indexRange[0]][1]),
 					x2 = series.xaxis.d2p(series.data[indexRange[1]][0]),
 					y2 = series.yaxis.d2p(series.data[indexRange[1]][1]),
-					relX = series.xaxis.d2p(position.x);
+					relX = series.xaxis.d2p(position.x),
+					value = series.yaxis.p2d(((y2 - y1) / (x2 - x1)) * (relX - x1) + y1);
 
-				values[i] = series.yaxis.p2d(((y2 - y1) / (x2 - x1)) * (relX - x1) + y1);
+				values[i] = !isNaN(value) ? value : null;
 			}
 		}
 
