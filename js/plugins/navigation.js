@@ -33,6 +33,8 @@
                 E.observe(this.el, 'flotr:centered', this.navigation.setCenter);
                 E.observe(this.el, 'flotr:select', this.navigation.setBounds);
                 E.observe(this.el, 'flotr:zoom', this.navigation.setBounds);
+
+                E.observe(this.el, 'flotr:aftergrid', function(x, y, options, context){ context.navigation.__bounds = {x1: x.min, y1: y.min, x2: x.max, y2: y.max}; });
             }
         },
         
