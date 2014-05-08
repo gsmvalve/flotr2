@@ -8,20 +8,26 @@ Flotr.addPlugin('tooltip', {
 	// Flotr callback bindings
 	callbacks: {
 		'mouseenter': function(event){
+			if(this.options.tooltip === false) return;
 			this.tooltip.show(event.originalEvent);
 		},
 		'flotr:track': function(position, series, values){
+			if(this.options.tooltip === false) return;
+
 			var serializedValues = [];
 			for(var i = 0, length = series.length; i < length; i++) serializedValues.push([series[i].name, series[i].formatValue(values[i])]);
 			this.tooltip.update(position, position.x, serializedValues);
 		},
 		'mouseleave': function(event){
+			if(this.options.tooltip === false) return;
 			this.tooltip.hide();
 		}
 	},
 
 
 	create: function(){
+		if(this.options.tooltip === false) return;
+		
 		var _tooltip = D.create('div');
 
 		D.addClass(_tooltip, 'flotr-tooltip');
