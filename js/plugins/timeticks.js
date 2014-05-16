@@ -42,14 +42,14 @@ var E = Flotr.EventAdapter,
                     step, stepId;
 
                 // Calculate the real step
-                _.every(this.timeticks.stepMap, function(step){
-                    var keyValue = idealStep.get(step[0]), alignmentValue;
+                _.every(this.timeticks.stepMap, function(map){
+                    var keyValue = idealStep.get(map[0]), alignmentValue;
 
                     if(!keyValue) return true;
 
-                    _.every(step[1], function(value){ alignmentValue = value; return (keyValue == value || keyValue % value == keyValue); });
+                    _.every(map[1], function(value){ alignmentValue = value; return (keyValue == value || keyValue % value == keyValue); });
 
-                    stepId = step[0];
+                    stepId = map[0];
                     step = moment.duration(alignmentValue, stepId);
                     return false;
                 });
