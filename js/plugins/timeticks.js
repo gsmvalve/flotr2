@@ -11,36 +11,23 @@ var E = Flotr.EventAdapter,
                 month: 'MMM',
                 day: 'D. MMM',
                 hour: 'HH:mm',
-                second: 'HH:mm:ss'
+                second: ':ss'
             }
         },
-        
-        
+
+
         /**
-         * Spec object for time spans
+         * Timeticks' step map
+         * First value is its human readable name/identificator,
+         * second value is a list of possible steps
          */
-        spec: [
-            [['years', 2], {tick: {step: ['months', 6], format: 'month'}, mainTick: {step: ['years', 1], format: 'year'}}],
-            [['years', 1], {tick: {step: ['months', 3], format: 'month'}, mainTick: {step: ['years', 1], format: 'year'}}],
-            [['months', 6], {tick: {step: ['months', 2], format: 'day'}, mainTick: {step: ['months', 1], format: 'month'}}],
-            [['months', 3], {tick: {step: ['days', 14], format: 'day'}}],
-            [['months', 1], {tick: {step: ['days', 7], format: 'day'}}],
-            [['weeks', 2], {tick: {step: ['days', 4], format: 'day'}}],
-            [['weeks', 1], {tick: {step: ['days', 2], format: 'month'}}],
-            [['days', 2], {tick: {step: ['hours', 12], format: 'hour'}, mainTick: {step: ['days', 1], format: 'day'}}],
-            [['hours', 24], {tick: {step: ['hours', 4], format: 'hour'}}],
-            [['hours', 8], {tick: {step: ['hours', 2], format: 'hour'}}],
-            [['hours', 3], {tick: {step: ['hours', 1], format: 'hour'}}],
-            [['hours', 2], {tick: {step: ['minutes', 30], format: 'hour'}}],
-            [['hours', 1], {tick: {step: ['minutes', 20], format: 'hour'}}],
-            [['minutes', 30], {tick: {step: ['minutes', 10], format: 'hour'}}],
-            [['minutes', 20], {tick: {step: ['minutes', 5], format: 'hour'}}],
-            [['minutes', 10], {tick: {step: ['minutes', 2], format: 'hour'}}],
-            [['minutes', 3], {tick: {step: ['minutes', 1], format: 'hour'}}],
-            [['minutes', 2], {tick: {step: ['seconds', 30], format: 'second'}}],
-            [['seconds', 30], {tick: {step: ['seconds', 10], format: 'second'}}],
-            [['seconds', 10], {tick: {step: ['seconds', 5], format: 'second'}}],
-            [['milliseconds', 1], {tick: {step: ['seconds', 1], format: 'second'}}]
+        stepMap: [
+            ['years', [1]],
+            ['months', [6, 3, 1]],
+            ['days', [14, 7, 3, 1]],
+            ['hours', [12, 6, 4, 3, 2, 1]],
+            ['minutes', [30, 15, 10, 5, 2, 1]],
+            ['seconds', [60, 30, 15, 10, 5, 1]]
         ],
         
         
@@ -49,41 +36,34 @@ var E = Flotr.EventAdapter,
                 if(this.options.xaxis.mode != 'smart-time') return;
 
                 var
-                    start = this.axes.x.min,
-                    end = this.axes.x.max,
-                    span = end - start,
-                    datum, meta;
+                    timezone = moment().zone(),
+                    span = moment.twix(moment(this.axes.x.min), moment(this.axes.x.max)),
+                    idealStep = moment.duration(span.asDuration() / this.timeticks.options.noTicks),
+                    step, stepId;
 
-                // Get the starting point for our time calculations
-                for(var i = 0, length = this.timeticks.spec.length, referenceMoment, referenceSpan, step; i < length; i++){
-                    // We like it human readable, so let the computer crunch the numbers
-                    referenceMoment = moment(0);
-                    referenceSpan = referenceMoment.add.apply(referenceMoment, this.timeticks.spec[i][0]).unix() * 1000;
+                // Calculate the real step
+                _.every(this.timeticks.stepMap, function(step){
+                    var keyValue = idealStep.get(step[0]), alignmentValue;
 
-                    if(span > referenceSpan){
-                        meta = this.timeticks.spec[i][1];
+                    if(!keyValue) return true;
 
-                        referenceMoment = moment(0);
-                        step = referenceMoment.add.apply(referenceMoment, meta.tick.step).unix() * 1000;
+                    _.every(step[1], function(value){ alignmentValue = value; return (keyValue == value || keyValue % value == keyValue); });
 
-                        datum = this.timeticks.findClosest(start, step);
-                        break;
-                    }
-                }
+                    stepId = step[0];
+                    step = moment.duration(alignmentValue, stepId);
+                    return false;
+                });
 
-                // Momentize the datum
-                datum = moment(datum);
+                span.start = this.timeticks.align(span.start, step, timezone, -1);
+                span.end = this.timeticks.align(span.end, step, timezone, 1);
 
-                var ticks = [];
-
-                while(datum.unix() * 1000 < end){
-                  // TODO: figure out a way to determine if tick matches main tick
-                  ticks.push({
-                    v: datum.unix() * 1000,
-                    label: this.timeticks.format(datum.unix() * 1000, meta.tick.format)
-                  });
-
-                  datum.add.apply(datum, meta.tick.step);
+                // Iterate the ticks and stack them on x-axis
+                var iterator = span.iterate(step), ticks = [];
+                while(iterator.hasNext()){
+                    var tick = iterator.next();
+                    // NOTE: Flotr seems to do its own timezone managment, so we're settings TZ to 0 before
+                    // creating the timestamp out of it
+                    ticks.push({v: tick.zone(0).valueOf(), label: this.timeticks.format(tick, stepId)});
                 }
 
                 this.axes.x.ticks = ticks;
@@ -91,19 +71,37 @@ var E = Flotr.EventAdapter,
         },
         
         
-        findClosest: function(point, span){
-            var modulus = (point - moment().zone() * 60 * 1000) % span;
-            return (modulus < span / 2) ? (point - modulus) : (point - modulus + span);
+        align: function(timePoint, step, timezone, direction){
+            var modulus = timePoint.zone(0).valueOf() % step;
+            return direction < 0 ? timePoint.subtract(modulus) : timePoint.subtract(modulus).add(step);
         },
         
         
         /**
          * Label formatter callback
          */
-        format: function(time, format){
-            time = moment(time);
-            var formats = this.timeticks.options.formats;
-            return time.format(formats[format]);
+        format: function(tick, step, timezone){
+            var formats = this.timeticks.options.formats, format = [];
+
+            switch(step){
+                case 'years':
+                    format = format.concat([formats.month, formats.year]);
+                    break;
+                case 'months':
+                    format = format.concat([formats.day]);
+                    if(tick.months() == 1) format.push(formats.year);
+                    break;
+                default:
+                    if(tick.hours() == 0 && tick.minutes() == 0 && tick.seconds() == 0) format.push(formats.day);
+
+                    if(step == 'seconds'){
+                        format.push(tick.seconds() == 0 ? formats.hour + formats.second : formats.second);
+                    }else{
+                        format.push(formats.hour);
+                    }
+            }
+
+            return tick.format(format.join(' '));
         }
     });
 
