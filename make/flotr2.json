@@ -31,7 +31,6 @@
       "./js/plugins/labels.js",
       "./js/plugins/legend.js",
       "./js/plugins/spreadsheet.js",
-      "./js/plugins/timeticks.js",
       "./js/plugins/titles.js",
       "./js/plugins/track.js",
       "./js/plugins/tooltip.js",

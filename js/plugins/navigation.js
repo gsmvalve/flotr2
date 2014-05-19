@@ -201,12 +201,16 @@
                 normalized = this.navigation.__normalizeBounds([bounds.y1, bounds.y2], this.axes.y);
                 this.navigation.__bounds.y1 = normalized[0];
                 this.navigation.__bounds.y2 = normalized[1];
+
+                _.each([this.axes.y, this.axes.y2], function(axis){ if(axis.scale) axis.calculateTicks(); });
             }
     
             if(this.navigation.selX){
                 normalized = this.navigation.__normalizeBounds([bounds.x1, bounds.x2], this.axes.x);
                 this.navigation.__bounds.x1 = normalized[0];
                 this.navigation.__bounds.x2 = normalized[1];
+
+                _.each([this.axes.x, this.axes.x2], function(axis){ if(axis.scale) axis.calculateTicks(); });
             }
     
             // Determine if we should redraw the plot.
