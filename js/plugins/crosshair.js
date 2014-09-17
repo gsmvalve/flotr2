@@ -69,18 +69,18 @@ Flotr.addPlugin('crosshair', {
     if (position) {
       if(mode.indexOf('x') != -1){
         context.clearRect(
-          Math.round(position.relX) + plotOffset.left,
+          Math.floor(position.relX) + plotOffset.left,
           plotOffset.top,
-          1,
+          3,
           this.plotHeight + 1
         );
       }
       if(mode.indexOf('y') != -1){
         context.clearRect(
           plotOffset.left,
-          Math.round(position.relY) + plotOffset.top,
+          Math.floor(position.relY) + plotOffset.top,
           this.plotWidth + 1,
-          1
+          3
         );    
       }
     }
