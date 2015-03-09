@@ -175,7 +175,7 @@
             position = position.x || position;
     
             var span = this.axes.x.max - this.axes.x.min;
-            this.navigation.setBounds(GSM.util.extend({}, this.navigation.__bounds, {
+            this.navigation.setBounds(Application.Util.extend({}, this.navigation.__bounds, {
                 x1: position - span / 2,
                 x2: position + span / 2
             }));

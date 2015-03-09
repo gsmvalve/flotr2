@@ -76,7 +76,7 @@
             // Create handle
             var handle = this.navigationBar.handle = D.create('div');
             D.addClass(handle, 'handle');
-            new GSM.ui.behaviours.draggable(handle, {
+            new Application.UI.Behaviours.Draggable(handle, {
                 constrainAxis: 'x',
                 limitingElement: this.navigationBar.element,
                 callbacks: {
@@ -87,7 +87,7 @@
             // Create zoom handles
             var leftHandle = this.navigationBar.leftHandle = D.create('div');
             D.addClass(leftHandle, 'left');
-            new GSM.ui.behaviours.draggable(leftHandle, {
+            new Application.UI.Behaviours.Draggable(leftHandle, {
                 constrainAxis: 'x',
                 limitingElement: this.navigationBar.element,
                 plot: this,
@@ -119,7 +119,7 @@
             
             var rightHandle = this.navigationBar.rightHandle = D.create('div');
             D.addClass(rightHandle, 'right');
-            new GSM.ui.behaviours.draggable(rightHandle, {
+            new Application.UI.Behaviours.Draggable(rightHandle, {
                 constrainAxis: 'x',
                 limitingElement: this.navigationBar.element,
                 plot: this,
