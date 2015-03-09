@@ -123,7 +123,7 @@ Flotr.addType('lines', {
       x1, x2, y1, y2, xc, yc, stack1, stack2, nextPoint,
       maxPoints = options.maxPoints,
       simplificationFactor = width / maxPoints;
-      
+
     var fill = function(){
       // TODO stacked lines
       if(!shadowOffset && options.fill && start){
@@ -218,16 +218,9 @@ Flotr.addType('lines', {
         context.lineTo(prevx + shadowOffset / 2, y1 + shadowOffset);
         context.lineTo(prevx + shadowOffset / 2, prevy);
       }else{
-        xc = (x1 + x2) / 2;
-        yc = (y1 + y2) / 2;
-        context.quadraticCurveTo(x1, y1, xc, yc);
+        context.lineTo(x1, y1);
       }
     }
-    
-    // End the curve
-    xc = (x1 + x2) / 2;
-    yc = (y1 + y2) / 2;
-    context.quadraticCurveTo(xc, yc, x2, y2);
 
     if (!options.fill || options.fill && !options.fillBorder) context.stroke();
     
