@@ -26,14 +26,12 @@
       "./js/plugins/download.js",
       "./js/plugins/grid.js",
       "./js/plugins/navigation.js",
-      "./js/plugins/navigation-bar.js",
       "./js/plugins/selection.js",
       "./js/plugins/labels.js",
       "./js/plugins/legend.js",
       "./js/plugins/spreadsheet.js",
       "./js/plugins/titles.js",
       "./js/plugins/track.js",
-      "./js/plugins/tooltip.js",
       "./js/plugins/zoom.js"
     ]
   }
