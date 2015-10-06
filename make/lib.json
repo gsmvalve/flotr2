@@ -4,9 +4,6 @@
     "bean": [
       { "src": "./lib/bean.js", "jshint": false }
     ],
-    "underscore": [
-      { "src": "./lib/underscore.js", "jshint": false }
-    ],
     "simplify": [
 	  { "src": "./lib/simplify.js", "jshint": false }
     ]
